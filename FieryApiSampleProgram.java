@@ -118,7 +118,7 @@ public class FieryApiSampleProgram {
 		try {
 
 			// Connect to the Fiery API Login URL using HttpURL Connection.
-			connection = (HttpURLConnection) new URL(hostname + "/live/api/v2/login")
+			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/login")
 				.openConnection();
 
 			// Set the HTTP Request Call type as POST.
@@ -188,7 +188,7 @@ public class FieryApiSampleProgram {
 		if (responseCode == 200 && sessionCookie != null) {
 
 			// Fiery API URL to Upload new Jobs.
-			String fileUploadURL = hostname + "/live/api/v2/jobs";
+			String fileUploadURL = hostname + "/live/api/v3/jobs";
 
 			// Create boundary object with the current timestamp in milli
 			// seconds.
@@ -259,7 +259,7 @@ public class FieryApiSampleProgram {
 		if (responseCode == 200) {
 			
 			// Get all the jobs in the Fiery.
-			connection = (HttpURLConnection) new URL(hostname + "/live/api/v2/jobs").openConnection();
+			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs").openConnection();
 			
 			// Set the Request Type as Get.
 			connection.setRequestMethod("GET");
@@ -288,7 +288,7 @@ public class FieryApiSampleProgram {
 			System.out.println("JOb ID Retrieved is \t" + jobId);
 			
 			//Get details of single Job BY Id retrieved above.
-			connection = (HttpURLConnection) new URL(hostname + "/live/api/v2/jobs/" + jobId).openConnection();
+			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/" + jobId).openConnection();
 			
 			//Set the Request method as GET
 			connection.setRequestMethod("GET");
@@ -313,7 +313,7 @@ public class FieryApiSampleProgram {
 			System.out.println("Get Single Job By Id\t" + response.toString());
 
 			//Rip the Job with JobId. (Rip can only be performed only once the job is successfully uploaded into the fiery. While uploading large files please wait for the file upload process to complete.)
-			connection = (HttpURLConnection) new URL(hostname + "/live/api/v2/jobs/" + jobId + "/rip").openConnection();
+			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/" + jobId + "/rip").openConnection();
 			
 			//Set the Rip Method type as PUT
 			connection.setRequestMethod("PUT");
@@ -338,7 +338,7 @@ public class FieryApiSampleProgram {
 			
 			//Print a a job in Fiery based on the JobID. (Print can only be performed only once the job is successfully uploaded into the fiery. While uploading large files please wait for the file upload process to complete before performing the print operation.)
 			//If print is followed by Rip. The print operation can return false if a rip is in progress. Issue the print command only when the file is successfully uploaded to fiery and is not busy in the rip process. 
-			connection = (HttpURLConnection) new URL(hostname + "/live/api/v2/jobs/" + jobId + "/print").openConnection();
+			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/" + jobId + "/print").openConnection();
 			
 			//Set the  Method type as GET
 			connection.setRequestMethod("PUT");
@@ -367,7 +367,7 @@ public class FieryApiSampleProgram {
 			 if(responseCode==200){
 				 
 				 	//Get Print Preview Job BY Id.
-					connection = (HttpURLConnection) new URL(hostname+"/live/api/v2/jobs/" + jobId+ "/preview/1").openConnection();
+					connection = (HttpURLConnection) new URL(hostname+"/live/api/v3/jobs/" + jobId+ "/preview/1").openConnection();
 					
 					//Set the  Method type as GET
 					connection.setRequestMethod("GET");
@@ -391,9 +391,61 @@ public class FieryApiSampleProgram {
 					System.out.println("Get Print Preview Job By Id\t"+response.toString());
 			 }
 
-			 
+			 	
+			 	//Job Update with Attribute for JobId. //Seting the Number of Copies of a job to 10
+			 	
+			 	connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/"+jobId ).openConnection();
+				
+			 	//Set the Rip Method type as PUT
+				connection.setRequestMethod("PUT");
+				
+				//Set the Session Cookie to the PUT request
+				connection.setRequestProperty("Cookie", sessionCookie);
+				
+			 	//Set the jsonPayload for Job Attributes
+			 	String jsonPayLoadForJobAttributes = "{\"attributes\": {\"numcopies\": \"10\"}}";
+			 	
+				// Set the HTTP Request Content-Type.
+				connection.setRequestProperty("Content-Type","application/json; charset=utf-8");
+
+				// Set the Output to true since the Http Request is POST and contains request data.
+				connection.setDoOutput(true);
+
+				// Create a new data output stream to write data to the specified underlying output stream.
+				dataOutputStream = new DataOutputStream(connection.getOutputStream());
+
+				// Write the JSON Payload bytes to the output stream object.
+				dataOutputStream.writeBytes(jsonPayLoadForJobAttributes);
+
+				// Read the input stream from the active HTTp connection.
+				inputStreamReader = connection.getInputStream();
+
+				// Read the text from the Input Stream
+				bufferedReader = new BufferedReader(new InputStreamReader(inputStreamReader));
+
+				// Create string object to read the response and use it to append the response to buffer.
+				String line;
+
+				// Create the string buffer to store the response from Fiery API Call.
+				response = new StringBuffer();
+
+				// Retrieve the response from bufferedReader.
+				while ((line = bufferedReader.readLine()) != null) {
+					response.append(line);
+					response.append('\r');
+				}
+				
+				//close the buffered reader.
+				bufferedReader.close();
+				
+				System.out.println("Update Job Attributes by Id\t" + response.toString());
+
+
+
+
+
 			// Logout.
-			connection = (HttpURLConnection) new URL(hostname + "/live/api/v2/logout").openConnection();
+			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/logout").openConnection();
 			
 			//Set the Request method as GET
 			connection.setRequestMethod("GET");
