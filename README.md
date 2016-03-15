@@ -8,6 +8,7 @@ Fiery job management samples. The sample code requires JRE installed on the syst
 
 ### Login
 
+```
 String jsonPayloadforLogin = "{\"username\":\"" + FieryUsername + "\",\"password\":\"" + FieryPassword + "\",\"accessrights\":{\"a1\":\"" + FieryAPIAccessKey + "\"}}";
 TrustAllCertificates.install(); //To neglect Certificate Errors
 HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v3/login").openConnection();
@@ -24,10 +25,11 @@ while ((line = in .readLine()) != null) {
 	response.append(line);
 	response.append('\r');
 }
+```
 
 ### LogOut
 
-
+```
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/logout").openConnection();
 connection.setRequestMethod("GET");
 in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -36,10 +38,11 @@ while ((inputLine = in.readLine()) != null) {
 response.append(inputLine);
 }
 in.close();
-
+```
 
 ### Get Jobs
 
+```
 String inputLine;
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs").openConnection();
 connection.setRequestMethod("GET");
@@ -50,10 +53,11 @@ while ((inputLine = in.readLine()) != null) {
 response.append(inputLine);
 }
 in.close();
-
+```
 
 ### Get Single Job
 
+```
 String jobId = "00000000.54889219.205";  //Job Id is set to the job id of the required job.
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/"+jobId).openConnection();
 connection.setRequestMethod("GET");
@@ -64,10 +68,11 @@ while ((inputLine = in.readLine()) != null) {
 response.append(inputLine);
 }		
 in.close();
-
+```
 
 ### Print a Job
 
+```
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/" + jobId+ "/print").openConnection();
 connection.setRequestMethod("PUT");
 connection.setRequestProperty("Cookie", sessionCookie);
@@ -77,10 +82,11 @@ while ((inputLine = in.readLine()) != null) {
 response.append(inputLine);
 }
 in.close();
-
+```
 
 ### Get Job Preview
 
+```
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/" + jobId+ "/preview/1").openConnection();
 connection.setRequestMethod("GET");
 connection.setRequestProperty("Cookie", sessionCookie);
@@ -90,9 +96,11 @@ while ((inputLine = in.readLine()) != null) {
 response.append(inputLine);
 }
 in.close();
+```
 
 ### Set Job Attribute
 
+```
 connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/"+jobId ).openConnection();
 connection.setRequestMethod("PUT");
 connection.setRequestProperty("Cookie", sessionCookie);
@@ -107,6 +115,6 @@ while ((inputLine = in.readLine()) != null) {
 response.append(inputLine);
 }
 in.close();
-
+```
 
 
