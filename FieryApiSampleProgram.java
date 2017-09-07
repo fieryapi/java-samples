@@ -7,11 +7,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -79,7 +81,7 @@ public class FieryApiSampleProgram {
 		final String password = "{{FIERY_PASSWORD}}";
 
 		// Set the API Key for to access Fiery APIs.
-		final String apikey ="{{API_KEY_STRING}}";
+		final String apikey = "{{API_KEY_STRING}}";
 
 		// File Path to upload to Fiery.
 		final String filePath ="{{ABSOLUTE_PATH_OF_THE_FILE}}";
@@ -211,7 +213,8 @@ public class FieryApiSampleProgram {
 			PrintWriter writer = null;
 
 			try {
-				writer = new PrintWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
+				OutputStream output = connection.getOutputStream();
+				writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"), true);
 				
 				writer.println("--" + boundary);
 				
@@ -221,28 +224,16 @@ public class FieryApiSampleProgram {
 				// Set the content type.
 				writer.println();
 
-				// Set the application content type/
-				// Initialize the Buffered Reader to null to write the file
-				// contents to the stream.
-				BufferedReader reader = null;
-				try {
-					
-					// Set the File contents as stream to post.
-					reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileToUpload)));
-					// Read Every line as a stream and write to the target print
-					// writer object.
-					for (String line;
-					(line = reader.readLine()) != null;) {
-						writer.println(line);
-					}
-				} finally {
-					if (reader != null) try {
-						// Shut the reader if the reader returns null.
-						reader.close();
-					} catch (IOException logOrIgnore) {
-						//when the reader is not closed property this exception occurs while force reader to close.
-					}
-				}
+				// Flush current writer before switching to output
+				writer.flush();
+
+				// Stream file content to output
+				File textFile = new File(filePath);
+				Files.copy(textFile.toPath(), output);
+
+				// Flush current output stream before switching to writer
+				output.flush();
+
 				writer.println("--" + boundary + "--");
 			} finally {
 				// Close the writer object on null.
