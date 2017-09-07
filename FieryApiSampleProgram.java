@@ -438,10 +438,10 @@ public class FieryApiSampleProgram {
 			// Logout.
 			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/logout").openConnection();
 			
-			//Set the Request method as GET
-			connection.setRequestMethod("GET");
+			//Set the Request method as POST
+			connection.setRequestMethod("POST");
 			
-			//Set the Session Cookie to the GET Request.
+			//Set the Session Cookie to the POST Request.
 			connection.setRequestProperty("Cookie", sessionCookie);
 			
 			//Read input stream that reads from the open connection
