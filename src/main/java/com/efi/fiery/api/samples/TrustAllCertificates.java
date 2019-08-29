@@ -12,35 +12,35 @@ import java.security.cert.X509Certificate;
  */
 final class TrustAllCertificates implements X509TrustManager, HostnameVerifier {
 
-    public X509Certificate[] getAcceptedIssuers() {
-        return null;
-    }
+	public X509Certificate[] getAcceptedIssuers() {
+		return null;
+	}
 
-    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-    }
+	public void checkClientTrusted(X509Certificate[] certs, String authType) {
+	}
 
-    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-    }
+	public void checkServerTrusted(X509Certificate[] certs, String authType) {
+	}
 
-    public boolean verify(String hostname, SSLSession session) {
-        return true;
-    }
+	public boolean verify(String hostname, SSLSession session) {
+		return true;
+	}
 
-    public static void install() {
-        try {
-            // Do Not use this in production.
-            TrustAllCertificates trustAll = new TrustAllCertificates();
-            // Install the all-trusting trust manager
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, new TrustManager[]{
-                            trustAll
-                    },
-                    new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            // Install the all-trusting host verifier
-            HttpsURLConnection.setDefaultHostnameVerifier(trustAll);
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new RuntimeException("Failed setting up all trusting certificate manager.", e);
-        }
-    }
+	public static void install() {
+		try {
+			// Do Not use this in production.
+			TrustAllCertificates trustAll = new TrustAllCertificates();
+			// Install the all-trusting trust manager
+			SSLContext sc = SSLContext.getInstance("SSL");
+			sc.init(null, new TrustManager[]{
+							trustAll
+					},
+					new java.security.SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+			// Install the all-trusting host verifier
+			HttpsURLConnection.setDefaultHostnameVerifier(trustAll);
+		} catch (NoSuchAlgorithmException | KeyManagementException e) {
+			throw new RuntimeException("Failed setting up all trusting certificate manager.", e);
+		}
+	}
 }

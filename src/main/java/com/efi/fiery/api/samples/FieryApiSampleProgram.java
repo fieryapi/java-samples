@@ -19,10 +19,10 @@ public class FieryApiSampleProgram {
 	public static void main(String[] args) throws IOException {
 
 		// Set the HostName as Fiery Name or IpAddress.
-		final String hostname ="https://{{HOST_NAME}}";
+		final String hostname = "https://{{HOST_NAME}}";
 
 		// Set the Username to login to the host fiery.
-		final String username ="{{FIERY_USERNAME}}";
+		final String username = "{{FIERY_USERNAME}}";
 
 		// Set the Password to login to the fiery.
 		final String password = "{{FIERY_PASSWORD}}";
@@ -31,15 +31,15 @@ public class FieryApiSampleProgram {
 		final String apikey = "{{API_KEY_STRING}}";
 
 		// File Path to upload to Fiery.
-		final String filePath ="{{ABSOLUTE_PATH_OF_THE_FILE}}";
+		final String filePath = "{{ABSOLUTE_PATH_OF_THE_FILE}}";
 
 		// Create the File Object with the location of the file to be uploaded into the Fiery.
 		File fileToUpload = new File(filePath);
 
 		// get the name of the file from the path.
 		String fileName = fileToUpload.getName();
-		
-		
+
+
 		// Create the payload to make the login request.
 		String jsonPayloadforLogin = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\",\"accessrights\":\"" + apikey + "\"}";
 
@@ -55,7 +55,7 @@ public class FieryApiSampleProgram {
 		StringBuffer response;
 
 		// Login to fiery using FieryAPI.
-		
+
 		// Do Not use trust all certificates in production.Ignores all
 		// certificate errors (exposed MITM attack) Comment the callback if the
 		// server has a valid CA signed certificate installed.
@@ -68,14 +68,14 @@ public class FieryApiSampleProgram {
 
 			// Connect to the Fiery API Login URL using HttpURL Connection.
 			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/login")
-				.openConnection();
+					.openConnection();
 
 			// Set the HTTP Request Call type as POST.
 			connection.setRequestMethod("POST");
 
 			// Set the HTTP Request Content-Type.
 			connection.setRequestProperty("Content-Type",
-				"application/json; charset=utf-8");
+					"application/json; charset=utf-8");
 
 			// Set the Output to true since the Http Request is POST and
 			// contains request data.
@@ -84,7 +84,7 @@ public class FieryApiSampleProgram {
 			// Create a new data output stream to write data to the specified
 			// underlying output stream.
 			dataOutputStream = new DataOutputStream(
-			connection.getOutputStream());
+					connection.getOutputStream());
 
 			// Write the JSON Payload bytes to the output stream object.
 			dataOutputStream.writeBytes(jsonPayloadforLogin);
@@ -94,7 +94,7 @@ public class FieryApiSampleProgram {
 
 			// Read the text from the Input Stream
 			bufferedReader = new BufferedReader(new InputStreamReader(
-			inputStreamReader));
+					inputStreamReader));
 
 			// Create string object to read the response and use it to append
 			// the response to buffer.
@@ -114,7 +114,7 @@ public class FieryApiSampleProgram {
 			// subsequent fiery api requests.
 			String headerName = null;
 			for (int i = 1;
-			(headerName = connection.getHeaderFieldKey(i)) != null; i++) {
+				 (headerName = connection.getHeaderFieldKey(i)) != null; i++) {
 				if (headerName.equals("Set-Cookie")) {
 					sessionCookie = connection.getHeaderField(i);
 				}
@@ -145,29 +145,29 @@ public class FieryApiSampleProgram {
 
 			// Open the connection to the Fiery URL using Http URl Connection.
 			connection = (HttpURLConnection) new URL(fileUploadURL)
-				.openConnection();
+					.openConnection();
 
 			// This sets request method to POST.
 			connection.setDoOutput(true);
 
 			// Set the Sesion cookie obtained from the login request to make subsequent Fiery API calls.
 			connection.setRequestProperty("Cookie", sessionCookie);
-			
+
 			// Set the content type header.
-			connection.setRequestProperty("Content-Type","multipart/form-data; boundary=" + boundary);
-			
+			connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+
 			// Initialize the Print Writer object to null.Creates a new PrintWriter, without automatic line flushing, with the specified file.
 			PrintWriter writer = null;
 
 			try {
 				OutputStream output = connection.getOutputStream();
 				writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"), true);
-				
+
 				writer.println("--" + boundary);
-				
+
 				// Set the Writer with the target file name content disposition.
 				writer.println("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"");
-				
+
 				// Set the content type.
 				writer.println();
 
@@ -195,22 +195,22 @@ public class FieryApiSampleProgram {
 
 		// Verify if the file is Uploaded successfully and is present in the Fiery.
 		if (responseCode == 200) {
-			
+
 			// Get all the jobs in the Fiery.
 			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs").openConnection();
-			
+
 			// Set the Request Type as Get.
 			connection.setRequestMethod("GET");
-			
+
 			// Set the session cookie from the login response to make calls to Fiery API.
 			connection.setRequestProperty("Cookie", sessionCookie);
 
 			// Initialize the response reader variable.
 			String inputLine;
-			
+
 			// Make the Get Request and capture the response.
 			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			
+
 			//Initialize the buffer to read the response contents.
 			response = new StringBuffer();
 
@@ -222,50 +222,50 @@ public class FieryApiSampleProgram {
 			System.out.println("Get Jobs from Fiery \t" + response.toString());
 
 			// Get the Details of the File Uploaded into the Fiery.
-			String jobId= retrieveJobIdFromResponse(response.toString(),fileName);
+			String jobId = retrieveJobIdFromResponse(response.toString(), fileName);
 			System.out.println("JOb ID Retrieved is \t" + jobId);
-			
+
 			//Get details of single Job BY Id retrieved above.
 			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/" + jobId).openConnection();
-			
+
 			//Set the Request method as GET
 			connection.setRequestMethod("GET");
-			
+
 			//Set the Session Cookie to the GET Request.
 			connection.setRequestProperty("Cookie", sessionCookie);
-			
+
 			//Read input stream that reads from the open connection
 			bufferedReader = new BufferedReader(new InputStreamReader(
 					connection.getInputStream()));
-			
+
 			//Initiate the String buffer to store the response.
 			response = new StringBuffer();
-			
+
 			//append the response to buffer.
 			while ((inputLine = bufferedReader.readLine()) != null) {
 				response.append(inputLine);
 			}
-			
+
 			//close the buffered reader.
 			bufferedReader.close();
 			System.out.println("Get Single Job By Id\t" + response.toString());
 
 			//Rip the Job with JobId. (Rip can only be performed only once the job is successfully uploaded into the fiery. While uploading large files please wait for the file upload process to complete.)
 			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/" + jobId + "/rip").openConnection();
-			
+
 			//Set the Rip Method type as PUT
 			connection.setRequestMethod("PUT");
-			
+
 			//Set the Session Cookie to the PUT request
 			connection.setRequestProperty("Cookie", sessionCookie);
-			
+
 			//Read input stream that reads from the open connection
 			bufferedReader = new BufferedReader(new InputStreamReader(
 					connection.getInputStream()));
-			
+
 			//Initiate the String buffer to store the response.
 			response = new StringBuffer();
-			
+
 			//append the response to buffer.
 			while ((inputLine = bufferedReader.readLine()) != null) {
 				response.append(inputLine);
@@ -273,149 +273,146 @@ public class FieryApiSampleProgram {
 			//close the buffered reader.
 			bufferedReader.close();
 			System.out.println("Rip Single Job By Id\t" + response.toString());
-			
+
 			//Print a a job in Fiery based on the JobID. (Print can only be performed only once the job is successfully uploaded into the fiery. While uploading large files please wait for the file upload process to complete before performing the print operation.)
 			//If print is followed by Rip. The print operation can return false if a rip is in progress. Issue the print command only when the file is successfully uploaded to fiery and is not busy in the rip process. 
 			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/" + jobId + "/print").openConnection();
-			
+
 			//Set the  Method type as GET
 			connection.setRequestMethod("PUT");
-			
+
 			//Set the Session Cookie to the GET Request.
 			connection.setRequestProperty("Cookie", sessionCookie);
-			
+
 			//Read input stream that reads from the open connection
 			bufferedReader = new BufferedReader(new InputStreamReader(
 					connection.getInputStream()));
-			
+
 			//Initiate the String buffer to store the response.
 			response = new StringBuffer();
-			
+
 			//append the response to buffer.
 			while ((inputLine = bufferedReader.readLine()) != null) {
 				response.append(inputLine);
 			}
-			
+
 			//close the buffered reader.
 			bufferedReader.close();
 			System.out.println("Print Single Job By Id\t" + response.toString());
 
-			
-			 //Preview The job from Fiery API based on the jobId only if the upload process is successful & Preview can only be generated once the Rip is successfully completed. use jobs api to get the job id after the rip.
-			 if(responseCode==200){
-				 
-				 	//Get Print Preview Job BY Id.
-					connection = (HttpURLConnection) new URL(hostname+"/live/api/v3/jobs/" + jobId+ "/preview/1").openConnection();
-					
-					//Set the  Method type as GET
-					connection.setRequestMethod("GET");
-					
-					//Set the Session Cookie to the GET Request.
-					connection.setRequestProperty("Cookie", sessionCookie);
-					
-					//Read input stream that reads from the open connection
-					bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-					
-					//Initiate the String buffer to store the response.
-					response = new StringBuffer();
-					
-					//append the response to buffer.
-					while ((inputLine = bufferedReader.readLine()) != null) {
-						response.append(inputLine.getBytes());
-					}
-					
-					//close the buffered reader.
-					bufferedReader.close();
-					System.out.println("Get Print Preview Job By Id\t"+response.toString());
-			 }
 
-			 	
-			 	//Job Update with Attribute for JobId. //Seting the Number of Copies of a job to 10
-			 	
-			 	connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/"+jobId ).openConnection();
-				
-			 	//Set the Rip Method type as PUT
-				connection.setRequestMethod("PUT");
-				
-				//Set the Session Cookie to the PUT request
+			//Preview The job from Fiery API based on the jobId only if the upload process is successful & Preview can only be generated once the Rip is successfully completed. use jobs api to get the job id after the rip.
+			if (responseCode == 200) {
+
+				//Get Print Preview Job BY Id.
+				connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/" + jobId + "/preview/1").openConnection();
+
+				//Set the  Method type as GET
+				connection.setRequestMethod("GET");
+
+				//Set the Session Cookie to the GET Request.
 				connection.setRequestProperty("Cookie", sessionCookie);
-				
-			 	//Set the jsonPayload for Job Attributes
-			 	String jsonPayLoadForJobAttributes = "{\"attributes\": {\"numcopies\": \"10\"}}";
-			 	
-				// Set the HTTP Request Content-Type.
-				connection.setRequestProperty("Content-Type","application/json; charset=utf-8");
 
-				// Set the Output to true since the Http Request is POST and contains request data.
-				connection.setDoOutput(true);
+				//Read input stream that reads from the open connection
+				bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-				// Create a new data output stream to write data to the specified underlying output stream.
-				dataOutputStream = new DataOutputStream(connection.getOutputStream());
-
-				// Write the JSON Payload bytes to the output stream object.
-				dataOutputStream.writeBytes(jsonPayLoadForJobAttributes);
-
-				// Read the input stream from the active HTTp connection.
-				inputStreamReader = connection.getInputStream();
-
-				// Read the text from the Input Stream
-				bufferedReader = new BufferedReader(new InputStreamReader(inputStreamReader));
-
-				// Create string object to read the response and use it to append the response to buffer.
-				String line;
-
-				// Create the string buffer to store the response from Fiery API Call.
+				//Initiate the String buffer to store the response.
 				response = new StringBuffer();
 
-				// Retrieve the response from bufferedReader.
-				while ((line = bufferedReader.readLine()) != null) {
-					response.append(line);
-					response.append('\r');
+				//append the response to buffer.
+				while ((inputLine = bufferedReader.readLine()) != null) {
+					response.append(inputLine.getBytes());
 				}
-				
+
 				//close the buffered reader.
 				bufferedReader.close();
-				
-				System.out.println("Update Job Attributes by Id\t" + response.toString());
+				System.out.println("Get Print Preview Job By Id\t" + response.toString());
+			}
 
 
+			//Job Update with Attribute for JobId. //Seting the Number of Copies of a job to 10
 
+			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/" + jobId).openConnection();
+
+			//Set the Rip Method type as PUT
+			connection.setRequestMethod("PUT");
+
+			//Set the Session Cookie to the PUT request
+			connection.setRequestProperty("Cookie", sessionCookie);
+
+			//Set the jsonPayload for Job Attributes
+			String jsonPayLoadForJobAttributes = "{\"attributes\": {\"numcopies\": \"10\"}}";
+
+			// Set the HTTP Request Content-Type.
+			connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+
+			// Set the Output to true since the Http Request is POST and contains request data.
+			connection.setDoOutput(true);
+
+			// Create a new data output stream to write data to the specified underlying output stream.
+			dataOutputStream = new DataOutputStream(connection.getOutputStream());
+
+			// Write the JSON Payload bytes to the output stream object.
+			dataOutputStream.writeBytes(jsonPayLoadForJobAttributes);
+
+			// Read the input stream from the active HTTp connection.
+			inputStreamReader = connection.getInputStream();
+
+			// Read the text from the Input Stream
+			bufferedReader = new BufferedReader(new InputStreamReader(inputStreamReader));
+
+			// Create string object to read the response and use it to append the response to buffer.
+			String line;
+
+			// Create the string buffer to store the response from Fiery API Call.
+			response = new StringBuffer();
+
+			// Retrieve the response from bufferedReader.
+			while ((line = bufferedReader.readLine()) != null) {
+				response.append(line);
+				response.append('\r');
+			}
+
+			//close the buffered reader.
+			bufferedReader.close();
+
+			System.out.println("Update Job Attributes by Id\t" + response.toString());
 
 
 			// Logout.
 			connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/logout").openConnection();
-			
+
 			//Set the Request method as POST
 			connection.setRequestMethod("POST");
-			
+
 			//Set the Session Cookie to the POST Request.
 			connection.setRequestProperty("Cookie", sessionCookie);
-			
+
 			//Read input stream that reads from the open connection
 			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			
+
 			//Initiate the String buffer to store the response.
 			response = new StringBuffer();
-			
+
 			//append the response to buffer.
 			while ((inputLine = bufferedReader.readLine()) != null) {
 				response.append(inputLine);
 			}
-			
+
 			//close the buffered reader.
 			bufferedReader.close();
 			System.out.println("Log Out\t" + response.toString());
 		}
 	}
 
-	static String retrieveJobIdFromResponse(String responseString, String fileName){
-		
+	static String retrieveJobIdFromResponse(String responseString, String fileName) {
+
 		//An alternative approach is to use the JSON parser to parse the response string to obtain jobId.
-		
+
 		// The logic retrieve jobID from response assuming the fiery has only successfully uploaded file with the file name as "SampleUpload.pdf".
-		int indexOfUploadFileTitle=responseString.indexOf(fileName);
-		String temp=responseString.substring(0,indexOfUploadFileTitle);
-		temp=temp.substring(temp.indexOf("id")+5,temp.indexOf("\","));
+		int indexOfUploadFileTitle = responseString.indexOf(fileName);
+		String temp = responseString.substring(0, indexOfUploadFileTitle);
+		temp = temp.substring(temp.indexOf("id") + 5, temp.indexOf("\","));
 		return temp;
 	}
 
