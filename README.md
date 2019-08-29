@@ -6,9 +6,22 @@ Fiery job management samples. The sample code requires JRE installed on the syst
 **Note** Always use secure connection (HTTPS) when connecting to Fiery API in production.
 
 
+## Compile this samples
+
+This sample code is using [Maven](http://maven.apache.org/) as build tool.
+In order to compile the sources, you need to download and install Maven for your operating system.
+
+```bash
+mvn compile
+```
+
+## Code examples for API requests
+
+The following code snippets doe outline how to code against the Fiery API.
+
 ### Login
 
-```
+```java
 String jsonPayloadforLogin = "{\"username\":\"" + FieryUsername + "\",\"password\":\"" + FieryPassword + "\",\"accessrights\":{\"a1\":\"" + FieryAPIAccessKey + "\"}}";
 TrustAllCertificates.install(); //To neglect Certificate Errors
 HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v3/login").openConnection();
@@ -29,7 +42,7 @@ while ((line = in .readLine()) != null) {
 
 ### LogOut
 
-```
+```java
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/logout").openConnection();
 connection.setRequestMethod("GET");
 in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -42,7 +55,7 @@ in.close();
 
 ### Get Jobs
 
-```
+```java
 String inputLine;
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs").openConnection();
 connection.setRequestMethod("GET");
@@ -57,7 +70,7 @@ in.close();
 
 ### Get Single Job
 
-```
+```java
 String jobId = "00000000.54889219.205";  //Job Id is set to the job id of the required job.
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/"+jobId).openConnection();
 connection.setRequestMethod("GET");
@@ -72,7 +85,7 @@ in.close();
 
 ### Print a Job
 
-```
+```java
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/" + jobId+ "/print").openConnection();
 connection.setRequestMethod("PUT");
 connection.setRequestProperty("Cookie", sessionCookie);
@@ -86,7 +99,7 @@ in.close();
 
 ### Get Job Preview
 
-```
+```java
 connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/" + jobId+ "/preview/1").openConnection();
 connection.setRequestMethod("GET");
 connection.setRequestProperty("Cookie", sessionCookie);
@@ -100,7 +113,7 @@ in.close();
 
 ### Set Job Attribute
 
-```
+```java
 connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/"+jobId ).openConnection();
 connection.setRequestMethod("PUT");
 connection.setRequestProperty("Cookie", sessionCookie);
