@@ -130,4 +130,10 @@ response.append(inputLine);
 in.close();
 ```
 
+### Licenses
 
+This Java code is provided under the terms and conditions of the [MIT](./LICENSE) license.
+
+The ```snellen_chart.pdf``` is licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+and is a derived work based on https://en.wikipedia.org/wiki/Snellen_chart#/media/File:Snellen_chart.svg,
+which was provided by Jeff Dahl.

@@ -3,7 +3,6 @@ package com.efi.fiery.api.samples;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,62 +13,10 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 public class FieryApiSampleProgram {
 
-	// Trust All Certificates Special Class to enable REST API Calls to EFI Next
-	// API. This class ignores certificate errors accessing Fiery API. Do Not
-	// use this in production. Ignores all certificate errors (exposed MITM
-	// attack)
-	private static final class TrustAllCertificates implements
-	X509TrustManager, HostnameVerifier {
-		public X509Certificate[] getAcceptedIssuers() {
-			return null;
-		}
-		public void checkClientTrusted(X509Certificate[] certs, String authType) {}
-
-		public void checkServerTrusted(X509Certificate[] certs, String authType) {}
-
-		public boolean verify(String hostname, SSLSession session) {
-			return true;
-		}
-
-		public static void install() {
-			try {
-				// Do Not use this in production.
-				TrustAllCertificates trustAll = new TrustAllCertificates();
-				// Install the all-trusting trust manager
-				SSLContext sc = SSLContext.getInstance("SSL");
-				sc.init(null, new TrustManager[] {
-					trustAll
-				},
-				new java.security.SecureRandom());
-				HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-				// Install the all-trusting host verifier
-				HttpsURLConnection.setDefaultHostnameVerifier(trustAll);
-			} catch (NoSuchAlgorithmException e) {
-				throw new RuntimeException(
-					"Failed setting up all trusting certificate manager.",
-				e);
-			} catch (KeyManagementException e) {
-				throw new RuntimeException(
-					"Failed setting up all trusting certificate manager.",
-				e);
-			}
-		}
-	}
-
-	public static void main(String[] args) throws IOException,
-	InterruptedException {
+	public static void main(String[] args) throws IOException {
 
 		// Set the HostName as Fiery Name or IpAddress.
 		final String hostname ="https://{{HOST_NAME}}";
@@ -275,7 +222,7 @@ public class FieryApiSampleProgram {
 			System.out.println("Get Jobs from Fiery \t" + response.toString());
 
 			// Get the Details of the File Uploaded into the Fiery.
-			String jobId=RetrieveJobIdFromResponse(response.toString(),fileName);
+			String jobId= retrieveJobIdFromResponse(response.toString(),fileName);
 			System.out.println("JOb ID Retrieved is \t" + jobId);
 			
 			//Get details of single Job BY Id retrieved above.
@@ -460,7 +407,8 @@ public class FieryApiSampleProgram {
 			System.out.println("Log Out\t" + response.toString());
 		}
 	}
-	final static String RetrieveJobIdFromResponse(String responseString, String fileName){
+
+	static String retrieveJobIdFromResponse(String responseString, String fileName){
 		
 		//An alternative approach is to use the JSON parser to parse the response string to obtain jobId.
 		
