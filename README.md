@@ -22,112 +22,79 @@ The following code snippets doe outline how to code against the Fiery API.
 ### Login
 
 ```java
-String jsonPayloadforLogin = "{\"username\":\"" + FieryUsername + "\",\"password\":\"" + FieryPassword + "\",\"accessrights\":{\"a1\":\"" + FieryAPIAccessKey + "\"}}";
-TrustAllCertificates.install(); //To neglect Certificate Errors
-HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v3/login").openConnection();
+String jsonPayloadforLogin = "{\"username\":\"" + FIERY_USERNAME
+        + "\",\"password\":\"" + FIERY_PASSWORD
+        + "\",\"apikey\":\"" + API_KEY + "\"}";
+HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v5/login").openConnection();
 connection.setRequestMethod("POST");
 connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 connection.setDoOutput(true);
-DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-wr.writeBytes(jsonPayloadforLogin);
-InputStream is = connection.getInputStream();
-BufferedReader in = new BufferedReader(new InputStreamReader(is));
-String line;
-StringBuffer response = new StringBuffer();
-while ((line = in .readLine()) != null) {
-	response.append(line);
-	response.append('\r');
-}
+DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
+dataOutputStream.writeBytes(jsonPayloadforLogin);
+readAllResponseFromConnection(connection);
 ```
 
 ### LogOut
 
 ```java
-connection = (HttpURLConnection) new URL(FieryAddress+"/live/logout").openConnection();
-connection.setRequestMethod("GET");
-in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-response.append(inputLine);
-}
-in.close();
+HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v5/logout").openConnection();
+connection.setRequestMethod("POST");
+connection.setRequestProperty("Cookie", sessionCookie);
+readAllResponseFromConnection(connection);
 ```
 
 ### Get Jobs
 
 ```java
-String inputLine;
-connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs").openConnection();
+HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v5/jobs").openConnection();
 connection.setRequestMethod("GET");
 connection.setRequestProperty("Cookie", sessionCookie);
-in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-response.append(inputLine);
-}
-in.close();
+String response = readAllResponseFromConnection(connection);
 ```
 
 ### Get Single Job
 
 ```java
 String jobId = "00000000.54889219.205";  //Job Id is set to the job id of the required job.
-connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/"+jobId).openConnection();
+HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v5/jobs/" + jobId).openConnection();
 connection.setRequestMethod("GET");
 connection.setRequestProperty("Cookie", sessionCookie);
-in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-response.append(inputLine);
-}		
-in.close();
+readAllResponseFromConnection(connection);
 ```
 
 ### Print a Job
 
 ```java
-connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/" + jobId+ "/print").openConnection();
+String jobId = "00000000.54889219.205";  //Job Id is set to the job id of the required job.
+HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v5/jobs/" + jobId + "/print").openConnection();
 connection.setRequestMethod("PUT");
 connection.setRequestProperty("Cookie", sessionCookie);
-in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-response.append(inputLine);
-}
-in.close();
+readAllResponseFromConnection(connection);
 ```
 
 ### Get Job Preview
 
 ```java
-connection = (HttpURLConnection) new URL(FieryAddress+"/live/api/v3/jobs/" + jobId+ "/preview/1").openConnection();
+HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v5/jobs/" + jobId + "/preview/1").openConnection();
 connection.setRequestMethod("GET");
 connection.setRequestProperty("Cookie", sessionCookie);
-in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-response.append(inputLine);
-}
-in.close();
+File file = new File("print-preview.jpg");
+readAllResponseAndWriteToFileFromConnection(connection, file);
 ```
 
 ### Set Job Attribute
 
 ```java
-connection = (HttpURLConnection) new URL(hostname + "/live/api/v3/jobs/"+jobId ).openConnection();
+String jobId = "00000000.54889219.205";  //Job Id is set to the job id of the required job.
+HttpURLConnection connection = (HttpURLConnection) new URL(FieryAddress + "/live/api/v5/jobs/" + jobId).openConnection();
+connection.setDoOutput(true);
 connection.setRequestMethod("PUT");
 connection.setRequestProperty("Cookie", sessionCookie);
-String jsonPayLoadForJobAttributes = "{\"attributes\": {\"numcopies\": \"10\"}}"; 
-connection.setRequestProperty("Content-Type","application/json; charset=utf-8");
-connection.setDoOutput(true);
+String jsonPayLoadForJobAttributes = "{\"attributes\": {\"numcopies\": \"10\"}}";
+connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
 dataOutputStream.writeBytes(jsonPayLoadForJobAttributes);
-in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-response.append(inputLine);
-}
-in.close();
+readAllResponseFromConnection(connection);
 ```
 
 ### Licenses
